@@ -1,4 +1,6 @@
-export default function convertTime(time) {
+const convertTime = (time) => {
+  if (!time || typeof time !== "string") return "--:--";
+
   let [hours, minutes, seconds] = time.split(":");
   hours = parseInt(hours);
 
@@ -6,4 +8,6 @@ export default function convertTime(time) {
   hours = hours % 12 || 12; // Converts 0 to 12 for midnight, and handles 12 PM
 
   return `${hours}:${minutes} ${period}`;
-}
+};
+
+export default convertTime;

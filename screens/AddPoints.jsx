@@ -61,11 +61,11 @@ const AddPoints = () => {
     const userId = await AsyncStorage.getItem("userId");
     try {
       // Step 1: Create Razorpay order from backend
-      const orderRes = await axios.post("api/payment_start", {
-        user_id: userId,
-        amount: requestForm.amount,
-      }, {
-        headers: { "Content-Type": "application/json" },
+      const formData = new FormData();
+      formData.append('user_id', userId);
+      formData.append('amount', requestForm.amount);
+      const orderRes = await axios.post("api/payment_start", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
       if (!orderRes.data.status) throw new Error(orderRes.data.message);
@@ -268,5 +268,5 @@ const AddPoints = () => {
     </SafeAreaView>
 
   );
- };
-  export default AddPoints;
+}
+export default AddPoints;

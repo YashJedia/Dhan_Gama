@@ -1,0 +1,10 @@
+1. admin pannel option for text change.
+2. profile page edit (email, number, username)
+3. welcome message line single.
+4. icon size reduce, add point button on call icon, withdrawal point button on whatsapp icon.
+5. wallet on select game page, game screen, single game.
+6. upi/merchant id feature in add point page. (not clear) or basically payment gateway 
+7. Suggestion amount while payment (300-500-1000-2000-3000-4000-5000-10000 max limit)
+8. Remove payment method and points input field from wihdraw points page and add holder name, bank account, ifsc code, bank name and enter points and then request button sumbmit (minimum withrawal request 300 and max 50000)
+9. my wallet payment gateway.
+10.add apk/website link in share button 

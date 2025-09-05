@@ -19,6 +19,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { homeDetails } from "@/store/thunk/homeThunk";
 // import { gameTypes } from "@/store/thunk/gameTypeThunk";
 import constants from "@/utils/constants";
+import CustomButton from "@/components/CustomButton";
+import googlePayIcon from "@/assets/icons/google-pay-icon.png";
+import bankIcon from "@/assets/icons/bank-icon.png";
 import { setting } from "@/store/thunk/settingThunk";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import convertTime from "@/utils/convertTime";
@@ -129,35 +132,49 @@ const Home = ({ navigation }) => {
             {/* start */}
             <View className="overflow-hidden pb-2"></View>
             <View className="flex-row justify-evenly items-center">
-              <TouchableOpacity
-                className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36"
-                onPress={makePhoneCall}
-                activeOpacity={0.7}
-              >
-                <Image
-                  source={constants.callIcon}
-                  className="w-12 h-12"
-                  resizeMode="contain"
-                />
-                <Text className="text-white text-lg font-psemibold mx-2">
-                  Call Us
-                </Text>
-              </TouchableOpacity>
+              <View className="flex-col items-center">
+                  <TouchableOpacity
+                    className="flex-col justify-center items-center border border-yellow-300 py-1 rounded-lg w-28 mb-1"
+                    onPress={() => navigation.navigate("AddPoints")}
+                    activeOpacity={0.8}
+                  >
+                    <Text className="text-white text-base font-psemibold mx-2">Add Point</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className="flex-col justify-center items-center border border-yellow-300 py-1 rounded-lg w-28"
+                    onPress={makePhoneCall}
+                    activeOpacity={0.7}
+                  >
+                    <Image
+                      source={constants.callIcon}
+                      className="w-8 h-8"
+                      resizeMode="contain"
+                    />
+                    <Text className="text-white text-base font-psemibold mx-2">Call Us</Text>
+                  </TouchableOpacity>
+                </View>
 
-              <TouchableOpacity
-                className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36"
-                onPress={openWhatsApp}
-                activeOpacity={0.7}
-              >
-                <Image
-                  source={constants.whatsappIcon}
-                  className="w-12 h-12"
-                  resizeMode="contain"
-                />
-                <Text className="text-white text-lg font-psemibold mx-2">
-                  Whatsapp
-                </Text>
-              </TouchableOpacity>
+              <View className="flex-col items-center">
+                  <TouchableOpacity
+                    className="flex-col justify-center items-center border border-yellow-300 py-1 rounded-lg w-28 mb-1"
+                    onPress={() => navigation.navigate("WithdrawPoints")}
+                    activeOpacity={0.8}
+                  >
+                    <Text className="text-white text-base font-psemibold mx-2">Withdrawal Point</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className="flex-col justify-center items-center border border-yellow-300 py-1 rounded-lg w-28"
+                    onPress={openWhatsApp}
+                    activeOpacity={0.7}
+                  >
+                    <Image
+                      source={constants.whatsappIcon}
+                      className="w-8 h-8"
+                      resizeMode="contain"
+                    />
+                    <Text className="text-white text-base font-psemibold mx-2">Whatsapp</Text>
+                  </TouchableOpacity>
+                </View>
             </View>
           </View>
 
@@ -182,11 +199,7 @@ const Home = ({ navigation }) => {
           <View className="overflow-hidden pb-2">
             <Animated.View
               className="flex-row justify-center items-center"
-              style={[
-                {
-                  transform: [{ translateX }],
-                },
-              ]}
+              style={{ transform: [{ translateX }] }}
             >
               {userStatus == "DISABLED" || userStatus == "false" ? (
                 <Text className="text-white font-pbold text-lg">
@@ -200,35 +213,49 @@ const Home = ({ navigation }) => {
             </Animated.View>
           </View>
           <View className="flex-row justify-evenly items-center">
-            <TouchableOpacity
-              className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36"
-              onPress={makePhoneCall}
-              activeOpacity={0.7}
-            >
-              <Image
-                source={constants.callIcon}
-                className="w-10 h-10"
-                resizeMode="contain"
-              />
-              <Text className="text-white text-lg font-psemibold mx-2">
-                Call Us
-              </Text>
-            </TouchableOpacity>
+            <View className="flex-col items-center">
+              <TouchableOpacity
+                className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36 mb-1"
+                onPress={() => navigation.navigate("Add Points")}
+                activeOpacity={0.8}
+              >
+                <Text className="text-white text-lg font-psemibold mx-2">Add Point</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36"
+                onPress={makePhoneCall}
+                activeOpacity={0.7}
+              >
+                <Image
+                  source={constants.callIcon}
+                  className="w-10 h-10"
+                  resizeMode="contain"
+                />
+                <Text className="text-white text-lg font-psemibold mx-2">Call Us</Text>
+              </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity
-              className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36"
-              onPress={openWhatsApp}
-              activeOpacity={0.7}
-            >
-              <Image
-                source={constants.whatsappIcon}
-                className="w-10 h-10"
-                resizeMode="contain"
-              />
-              <Text className="text-white text-lg font-psemibold mx-2">
-                Whatsapp
-              </Text>
-            </TouchableOpacity>
+            <View className="flex-col items-center">
+              <TouchableOpacity
+                className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36 mb-1"
+                onPress={() => navigation.navigate("Withdraw Points")}
+                activeOpacity={0.8}
+              >
+                <Text className="text-white text-lg font-psemibold mx-2">Withdraw Point</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36"
+                onPress={openWhatsApp}
+                activeOpacity={0.7}
+              >
+                <Image
+                  source={constants.whatsappIcon}
+                  className="w-10 h-10"
+                  resizeMode="contain"
+                />
+                <Text className="text-white text-lg font-psemibold mx-2">Whatsapp</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* end */}

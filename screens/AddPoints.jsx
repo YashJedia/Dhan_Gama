@@ -64,7 +64,7 @@ const AddPoints = () => {
       const formData = new FormData();
       formData.append('user_id', userId);
       formData.append('amount', requestForm.amount);
-      const orderRes = await axios.post("api/payment_start", formData, {
+      const orderRes = await axios.post("http://10.0.2.2:8000/api/payment_start", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -79,7 +79,7 @@ const AddPoints = () => {
   key: 'rzp_test_SCpR4d4DbU6De2', // Razorpay test key for testing
         amount: requestForm.amount * 100,
         order_id: orderId,
-        name: requestForm.username,
+        name: requestForm.username,    
         prefill: {
           email: '',
           contact: '',
@@ -90,7 +90,7 @@ const AddPoints = () => {
       RazorpayCheckout.open(options)
         .then(async (paymentData) => {
           // Step 3: Confirm payment to backend
-          await axios.post("api/payment_success", {
+          await axios.post("http://10.0.2.2:8000/api/payment_success", {
             shopping_order_id: orderId,
             razorpay_payment_id: paymentData.razorpay_payment_id,
           }, {

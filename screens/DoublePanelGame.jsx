@@ -6,7 +6,7 @@ import {
   Alert,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "@/components/CustomButton";
 import InputBox from "@/components/InputBox";
@@ -14,11 +14,12 @@ import CustomRadioButtonGroup from "@/components/CustomRadioButtonGroup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { getProfile } from "@/store/thunk/profileThunk";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { doublePanelValues } from "@/utils/gamePanelValues";
 import CustomDropDown from "@/components/CustomDropDown";
+import { Ionicons } from "@expo/vector-icons";
 
-const DoublePanelGame = ({ route }) => {
+const DoublePanelGame = ({ route, navigation }) => {
   const { gameTypeId, gameId, gameName, bidType } = route.params;
   const today = new Date();
   const day = String(today.getDate()).padStart(2, "0");
@@ -32,6 +33,24 @@ const DoublePanelGame = ({ route }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch();
+  const { profile } = useSelector((state) => state.profile);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate("My Wallet")}
+          style={{ marginRight: 12, flexDirection: "row", alignItems: "center" }}
+        >
+          <Ionicons name="diamond" size={24} color="#fff" />
+          <Text style={{ marginLeft: 4, fontSize: 20, color: "#fff" }}>
+            {`${Math.floor((profile?.user_wallet ?? 0) * 100) / 100}`}
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, profile]);
 
   const validateDoubleInput = (input) => {
     // Check if any digit appears more than twice

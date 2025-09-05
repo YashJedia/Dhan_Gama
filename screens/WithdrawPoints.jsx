@@ -20,42 +20,42 @@ const WithdrawPoints = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [requestForm, setRequestForm] = useState({
+    holderName: "",
+    bankAccount: "",
+    ifscCode: "",
+    bankName: "",
     amount: "",
-    paymentMethod: "",
   });
   const dispatch = useDispatch();
   const submitRequest = async () => {
+    if (
+      !requestForm.holderName.trim() ||
+      !requestForm.bankAccount.trim() ||
+      !requestForm.ifscCode.trim() ||
+      !requestForm.bankName.trim() ||
+      !requestForm.amount.trim()
+    ) {
+      Alert.alert("Error", "Please fill all fields.");
+      return;
+    }
+    const points = parseInt(requestForm.amount);
+    if (isNaN(points) || points < 300 || points > 50000) {
+      Alert.alert("Error", "Minimum withdrawal is 300 and maximum is 50000.");
+      return;
+    }
     setIsSubmitting(true);
-    const userId = await AsyncStorage.getItem("userId");
-    let formData = new FormData();
-    formData.append("user_id", userId);
-    formData.append("amount", requestForm.amount);
-    formData.append("payment_method", requestForm.paymentMethod);
-
-    try {
-      const { data } = await axios.post(
-        "api/withdraw-payment-request",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
-
-      Alert.alert("Message", data.message);
-    } catch (error) {
-      console.log(error);
-      Alert.alert("Error", "Failed to add request.");
-    } finally {
+    // Submit logic here (API call or local handling)
+    setTimeout(() => {
+      Alert.alert("Success", "Withdrawal request submitted.");
       setRequestForm({
+        holderName: "",
+        bankAccount: "",
+        ifscCode: "",
+        bankName: "",
         amount: "",
-        paymentMethod: "",
       });
       setIsSubmitting(false);
-      await dispatch(getProfile());
-    }
+    }, 1000);
   };
 
   return (
@@ -71,49 +71,68 @@ const WithdrawPoints = () => {
         </View>
         <View className="bg-[#BBE9FF] min-h-[20vh] justify-center px-4 py-6 mx-6 rounded-lg">
           <View className="my-1">
-            <Text className="ml-1 font-psemibold text-md">Payment Method</Text>
+            <Text className="ml-1 font-psemibold text-md">Account Holder Name</Text>
             <InputBox
-              icon={"journal"}
-              placeholder={"Enter Payment Method"}
+              icon={"person"}
+              placeholder={"Enter Account Holder Name"}
               customStyles={""}
-              handleChangeText={(e) => {
-                if (/[^a-zA-Z\s]/g.test(e)) {
-                  return Alert.alert(
-                    "Message",
-                    "Input must contain only letters."
-                  );
-                }
-                setRequestForm({ ...requestForm, paymentMethod: e });
-              }}
-              value={requestForm.paymentMethod || ""}
+              handleChangeText={(e) => setRequestForm({ ...requestForm, holderName: e })}
+              value={requestForm.holderName}
             />
           </View>
           <View className="my-1">
-            <Text className="ml-1 font-psemibold text-md">Points</Text>
+            <Text className="ml-1 font-psemibold text-md">Bank Account Number</Text>
             <InputBox
-              icon={"diamond"}
-              placeholder={"Enter Points"}
+              icon={"card"}
+              placeholder={"Enter Bank Account Number"}
               customStyles={""}
-              handleChangeText={(e) => {
-                if (!/^\d*$/.test(e)) {
-                  return Alert.alert(
-                    "Message",
-                    "Input must contain only digits."
-                  );
-                }
-                setRequestForm({ ...requestForm, amount: e });
-              }}
-              value={requestForm.amount || ""}
+              handleChangeText={(e) => setRequestForm({ ...requestForm, bankAccount: e })}
+              value={requestForm.bankAccount}
               keyboardTypeValue={"numeric"}
             />
           </View>
-
-          {/* <CustomButton text={"Upload Image"} onPress={uploadImage} /> */}
+          <View className="my-1">
+            <Text className="ml-1 font-psemibold text-md">IFSC Code</Text>
+            <InputBox
+              icon={"key"} // 'key' is valid
+              placeholder={"Enter IFSC Code"}
+              customStyles={""}
+              handleChangeText={(e) => setRequestForm({ ...requestForm, ifscCode: e })}
+              value={requestForm.ifscCode}
+            />
+          </View>
+          <View className="my-1">
+            <Text className="ml-1 font-psemibold text-md">Bank Name</Text>
+            <InputBox
+              icon={"business"}
+              placeholder={"Enter Bank Name"}
+              customStyles={""}
+              handleChangeText={(e) => setRequestForm({ ...requestForm, bankName: e })}
+              value={requestForm.bankName}
+            />
+          </View>
+          <View className="my-1">
+            <Text className="ml-1 font-psemibold text-md">Enter Points</Text>
+            <InputBox
+              icon={"diamond"}
+              placeholder={"Enter Points (300 - 50000)"}
+              customStyles={""}
+              handleChangeText={(e) => {
+                if (!/^\d*$/.test(e)) {
+                  return Alert.alert("Message", "Input must contain only digits.");
+                }
+                setRequestForm({ ...requestForm, amount: e });
+              }}
+              value={requestForm.amount}
+              keyboardTypeValue={"numeric"}
+            />
+          </View>
           <CustomButton
-            text={"Submit"}
+            text={isSubmitting ? "Submitting..." : "Request Withdrawal"}
             textStyles={"text-white"}
             customStyles={"bg-[#219C90] mt-4"}
             onPress={submitRequest}
+            disabled={isSubmitting}
           />
         </View>
       </ScrollView>

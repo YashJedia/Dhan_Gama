@@ -13,11 +13,12 @@ import InputBox from "@/components/InputBox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { getProfile } from "@/store/thunk/profileThunk";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CustomDropDown from "@/components/CustomDropDown";
 import { sangamValues } from "@/utils/gamePanelValues";
+import { Ionicons } from "@expo/vector-icons";
 
-const HalfSangamGame = ({ route }) => {
+const HalfSangamGame = ({ route, navigation }) => {
   const { gameTypeId, gameId, gameName, bidType } = route.params;
   const today = new Date();
   const day = String(today.getDate()).padStart(2, "0");
@@ -32,7 +33,24 @@ const HalfSangamGame = ({ route }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkBox, setCheckBox] = useState("open");
+  const { profile } = useSelector((state) => state.profile);
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate("My Wallet")}
+          style={{ marginRight: 12, flexDirection: "row", alignItems: "center" }}
+        >
+          <Ionicons name="diamond" size={24} color="#fff" />
+          <Text style={{ marginLeft: 4, fontSize: 20, color: "#fff" }}>
+            {`${Math.floor((profile?.user_wallet ?? 0) * 100) / 100}`}
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, profile]);
   useEffect(() => {
     setBidForm({
       value1: [],

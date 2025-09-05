@@ -12,6 +12,7 @@ import notificationsReducer from "./store/slice/notificationsSlice";
 import settingReducer from "./store/slice/settingSlice";
 
 import axios from "axios";
+import { HomeMessageProvider } from "./context/HomeMessageContext";
 import { baseUrl } from "./utils/common";
 
 export const store = configureStore({
@@ -34,7 +35,9 @@ axios.defaults.baseURL = baseUrl();
 export default function App() {
   return (
     <Provider store={store}>
-      <AppNavigation />
+      <HomeMessageProvider>
+        <AppNavigation />
+      </HomeMessageProvider>
     </Provider>
   );
 }

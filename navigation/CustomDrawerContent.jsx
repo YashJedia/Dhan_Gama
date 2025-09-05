@@ -73,6 +73,23 @@ function CustomDrawerContent(props) {
           {userStatus == "false" || userStatus == "DISABLED" ? (
             <View className="bg-[#E0E0E0] pt-2">
               <CustomDrawerItem
+              
+                itemName="Admin"
+                itemImage={constants.profileIcon}
+                currentRoute={currentRoute}
+                onPress={() => {
+                  // Get homeMessage and setHomeMessage from Home screen
+                  const homeScreen = props.navigation.dangerouslyGetState().routes.find(r => r.name === 'Home');
+                  let homeMessage = "Welcome to DHAN GAMA ENTERTAINMENT APP!";
+                  let setHomeMessage = null;
+                  if (homeScreen && homeScreen.params) {
+                    homeMessage = homeScreen.params.homeMessage || homeMessage;
+                    setHomeMessage = homeScreen.params.setHomeMessage || null;
+                  }
+                  props.navigation.navigate("Admin Home Message", { homeMessage, setHomeMessage });
+                }}
+              />
+              <CustomDrawerItem
                 itemName="Home"
                 itemImage={constants.homeIcon}
                 currentRoute={currentRoute}
@@ -130,6 +147,14 @@ function CustomDrawerContent(props) {
                 currentRoute={currentRoute}
                 onPress={() => {
                   props.navigation.navigate("Profile");
+                }}
+              />
+              <CustomDrawerItem
+                itemName="Admin"
+                itemImage={constants.profileIcon}
+                currentRoute={currentRoute}
+                onPress={() => {
+                  props.navigation.navigate("Admin Home Message");
                 }}
               />
               <CustomDrawerItem

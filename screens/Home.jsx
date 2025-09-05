@@ -12,6 +12,8 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { useHomeMessage } from "../context/HomeMessageContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import HomePageImage from "@/assets/images/home-page.jpg";
 import MarketStatusCard from "@/components/MarketStatusCard.jsx";
@@ -33,6 +35,7 @@ const Home = ({ navigation }) => {
   const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
   const [userStatus, setUserStatus] = useState("");
+  const { homeMessage } = useHomeMessage();
   const { homeData } = useSelector((state) => state.home);
   const { settingData } = useSelector((state) => state.setting);
   // Get the current date and time
@@ -201,15 +204,7 @@ const Home = ({ navigation }) => {
               className="flex-row justify-center items-center"
               style={{ transform: [{ translateX }] }}
             >
-              {userStatus == "DISABLED" || userStatus == "false" ? (
-                <Text className="text-white font-pbold text-lg">
-                  Welcome to DHAN GAMA ENTERTAINMENT APP!
-                </Text>
-              ) : (
-                <Text className="text-white font-pbold text-xl">
-                  Welcome to DHAN GAMA Betting APP!
-                </Text>
-              )}
+              <Text className="text-white font-pbold text-lg">{homeMessage}</Text>
             </Animated.View>
           </View>
           <View className="flex-row justify-evenly items-center">

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import Home from "../screens/Home";
+import AdminHomeMessage from "../screens/AdminHomeMessage";
 import Profile from "../screens/Profile";
 import MyWallet from "../screens/MyWallet";
 import AddPoints from "../screens/AddPoints";
@@ -183,6 +184,7 @@ const DrawerNavigation = () => {
       <Drawer.Screen name="My Wallet" component={MyWallet} />
       <Drawer.Screen name="Add Points" component={AddPoints} />
       <Drawer.Screen name="Withdraw Points" component={WithdrawPoints} />
+  <Drawer.Screen name="Admin Home Message" component={AdminHomeMessage} />
       {/* <Drawer.Screen name="Bank Details" component={BankDetails} /> */}
       {/* <Drawer.Screen name="Win History" component={WinHistory} /> */}
       <Drawer.Screen name="My Bids" component={BidHistory} />

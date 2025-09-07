@@ -129,64 +129,62 @@ const Home = ({ navigation }) => {
 
   if (!userStatus?.length) {
     return (
-      <SafeAreaView className="">
-        <View className="bg-[#e0f5ff] h-full">
-          <View className="bg-[#219C90] w-full justify-center px-1 rounded-b-xl pb-2">
+      <SafeAreaView>
+        <View style={{ backgroundColor: '#e0f5ff', flex: 1 }}>
+          <View style={{ backgroundColor: '#219C90', width: '100%', justifyContent: 'center', paddingHorizontal: 8, borderBottomLeftRadius: 16, borderBottomRightRadius: 16, paddingBottom: 8 }}>
             {/* start */}
-            <View className="overflow-hidden pb-2"></View>
-            <View className="flex-row justify-evenly items-center">
-              <View className="flex-col items-center">
-                  <TouchableOpacity
-                    className="flex-col justify-center items-center border border-yellow-300 py-1 rounded-lg w-28 mb-1"
-                    onPress={() => navigation.navigate("AddPoints")}
-                    activeOpacity={0.8}
-                  >
-                    <Text className="text-white text-base font-psemibold mx-2">Add Point</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="flex-col justify-center items-center border border-yellow-300 py-1 rounded-lg w-28"
-                    onPress={makePhoneCall}
-                    activeOpacity={0.7}
-                  >
-                    <Image
-                      source={constants.callIcon}
-                      className="w-8 h-8"
-                      resizeMode="contain"
-                    />
-                    <Text className="text-white text-base font-psemibold mx-2">Call Us</Text>
-                  </TouchableOpacity>
-                </View>
-
-              <View className="flex-col items-center">
-                  <TouchableOpacity
-                    className="flex-col justify-center items-center border border-yellow-300 py-1 rounded-lg w-28 mb-1"
-                    onPress={() => navigation.navigate("WithdrawPoints")}
-                    activeOpacity={0.8}
-                  >
-                    <Text className="text-white text-base font-psemibold mx-2">Withdrawal Point</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="flex-col justify-center items-center border border-yellow-300 py-1 rounded-lg w-28"
-                    onPress={openWhatsApp}
-                    activeOpacity={0.7}
-                  >
-                    <Image
-                      source={constants.whatsappIcon}
-                      className="w-8 h-8"
-                      resizeMode="contain"
-                    />
-                    <Text className="text-white text-base font-psemibold mx-2">Whatsapp</Text>
-                  </TouchableOpacity>
-                </View>
+            <View style={{ overflow: 'hidden', paddingBottom: 8 }} />
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+              <View style={{ flex: 1, minWidth: '48%', alignItems: 'center', marginBottom: 8 }}>
+                <TouchableOpacity
+                  style={styles.responsiveButton}
+                  onPress={() => navigation.navigate("AddPoints")}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.responsiveButtonText}>Add Point</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.responsiveButton}
+                  onPress={makePhoneCall}
+                  activeOpacity={0.7}
+                >
+                  <Image
+                    source={constants.callIcon}
+                    style={styles.responsiveIcon}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.responsiveButtonText}>Call Us</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{ flex: 1, minWidth: '48%', alignItems: 'center', marginBottom: 8 }}>
+                <TouchableOpacity
+                  style={styles.responsiveButton}
+                  onPress={() => navigation.navigate("WithdrawPoints")}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.responsiveButtonText}>Withdraw Point</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.responsiveButton}
+                  onPress={openWhatsApp}
+                  activeOpacity={0.7}
+                >
+                  <Image
+                    source={constants.whatsappIcon}
+                    style={styles.responsiveIcon}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.responsiveButtonText}>Whatsapp</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-
           <ScrollView
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
           >
-            <View className="bg-[#219C90] m-2 min-h-screen rounded-xl p-2"></View>
+            <View style={{ backgroundColor: '#219C90', margin: 8, minHeight: 200, borderRadius: 16, padding: 8 }} />
           </ScrollView>
         </View>
         <StatusBar backgroundColor="#219C90" style="light" />
@@ -199,56 +197,61 @@ const Home = ({ navigation }) => {
       <View className="bg-[#e0f5ff] h-full">
         <View className="bg-[#219C90] w-full justify-center px-1 rounded-b-xl pb-2">
           {/* start */}
-          <View className="overflow-hidden pb-2">
+          <View style={{ overflow: 'hidden', paddingBottom: 8 }}>
             <Animated.View
-              className="flex-row justify-center items-center"
-              style={{ transform: [{ translateX }] }}
+              style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', transform: [{ translateX }] }}
             >
-              <Text className="text-white font-pbold text-lg">{homeMessage}</Text>
+              <Text
+                style={[styles.homeMessage, { fontSize: 14 }]} // Decreased font size for longer messages
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.7}
+              >
+                {homeMessage}
+              </Text>
             </Animated.View>
           </View>
-          <View className="flex-row justify-evenly items-center">
-            <View className="flex-col items-center">
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+            <View style={{ flex: 1, minWidth: '48%', alignItems: 'center', marginBottom: 8 }}>
               <TouchableOpacity
-                className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36 mb-1"
+                style={styles.responsiveButton}
                 onPress={() => navigation.navigate("Add Points")}
                 activeOpacity={0.8}
               >
-                <Text className="text-white text-lg font-psemibold mx-2">Add Point</Text>
+                <Text style={styles.responsiveButtonText}>Add Point</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36"
+                style={styles.responsiveButton}
                 onPress={makePhoneCall}
                 activeOpacity={0.7}
               >
                 <Image
                   source={constants.callIcon}
-                  className="w-10 h-10"
+                  style={styles.responsiveIcon}
                   resizeMode="contain"
                 />
-                <Text className="text-white text-lg font-psemibold mx-2">Call Us</Text>
+                <Text style={styles.responsiveButtonText}>Call Us</Text>
               </TouchableOpacity>
             </View>
-
-            <View className="flex-col items-center">
+            <View style={{ flex: 1, minWidth: '48%', alignItems: 'center', marginBottom: 8 }}>
               <TouchableOpacity
-                className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36 mb-1"
+                style={styles.responsiveButton}
                 onPress={() => navigation.navigate("Withdraw Points")}
                 activeOpacity={0.8}
               >
-                <Text className="text-white text-lg font-psemibold mx-2">Withdraw Point</Text>
+                <Text style={styles.responsiveButtonText}>Withdraw Point</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex-col justify-center items-center border border-yellow-300 py-2 rounded-lg mx-2 w-36"
+                style={styles.responsiveButton}
                 onPress={openWhatsApp}
                 activeOpacity={0.7}
               >
                 <Image
                   source={constants.whatsappIcon}
-                  className="w-10 h-10"
+                  style={styles.responsiveIcon}
                   resizeMode="contain"
                 />
-                <Text className="text-white text-lg font-psemibold mx-2">Whatsapp</Text>
+                <Text style={styles.responsiveButtonText}>Whatsapp</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -376,5 +379,36 @@ const styles = StyleSheet.create({
   animatedContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  responsiveButton: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FFD600',
+    paddingVertical: 12,
+    borderRadius: 12,
+    width: '95%',
+    marginBottom: 8,
+    backgroundColor: 'transparent',
+  },
+  responsiveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginHorizontal: 8,
+    textAlign: 'center',
+  },
+  responsiveIcon: {
+    width: 32,
+    height: 32,
+    marginBottom: 4,
+  },
+  homeMessage: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18,
+    maxWidth: '90%',
+    textAlign: 'center',
   },
 });

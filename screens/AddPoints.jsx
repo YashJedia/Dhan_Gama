@@ -8,7 +8,8 @@ import {
   Alert,
 } from "react-native";
 import React, { useState } from "react";
-import RazorpayCheckout from 'react-native-razorpay';
+import { Linking } from 'react-native';
+// import PayU/UPI intent integration here (see comments below)
 import { SafeAreaView } from "react-native-safe-area-context";
 import InputBox from "@/components/InputBox";
 import CustomButton from "@/components/CustomButton";
@@ -60,54 +61,34 @@ const AddPoints = () => {
     setIsSubmitting(true);
     const userId = await AsyncStorage.getItem("userId");
     try {
-      // Step 1: Create Razorpay order from backend
+      // Step 1: Request payment details from backend (PayU order/hash)
+      // You will need to implement a new endpoint in your backend to generate a PayU order and return UPI details or a UPI intent URL.
       const formData = new FormData();
       formData.append('user_id', userId);
       formData.append('amount', requestForm.amount);
-      const orderRes = await axios.post("http://10.0.2.2:8000/api/payment_start", formData, {
+      // Example endpoint: /api/payu_payment_start
+      const orderRes = await axios.post("http://10.0.2.2:8000/api/payu_payment_start", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
       if (!orderRes.data.status) throw new Error(orderRes.data.message);
-      const orderId = orderRes.data.data.order_id;
+      const upiUrl = orderRes.data.data.upi_url; // e.g., "upi://pay?..."
 
-      // Step 2: Open Razorpay payment modal
-      const options = {
-        description: 'Add Points',
-        image: 'https://yourapp.com/logo.png', // update with your logo
-        currency: 'INR',
-  key: 'rzp_test_SCpR4d4DbU6De2', // Razorpay test key for testing
-        amount: requestForm.amount * 100,
-        order_id: orderId,
-        name: requestForm.username,    
-        prefill: {
-          email: '',
-          contact: '',
-          name: requestForm.username,
-        },
-        theme: { color: '#219C90' },
-      };
-      RazorpayCheckout.open(options)
-        .then(async (paymentData) => {
-          // Step 3: Confirm payment to backend
-          await axios.post("http://10.0.2.2:8000/api/payment_success", {
-            shopping_order_id: orderId,
-            razorpay_payment_id: paymentData.razorpay_payment_id,
-          }, {
-            headers: { "Content-Type": "application/json" },
-            withCredentials: true,
-          });
-          Alert.alert("Success", "Payment successful! Points will be credited soon.");
-        })
-        .catch((error) => {
-          Alert.alert("Payment Failed", error.description || "Payment was not completed.");
-        })
-        .finally(() => {
-          setIsSubmitting(false);
-        });
-    } catch (error) {
-      Alert.alert("Error", error.message || "Failed to start payment.");
+      // Step 2: Open UPI app using intent
+      // This will open the user's UPI app with payment details
+      
+      const supported = await Linking.canOpenURL(upiUrl);
+      if (supported) {
+        await Linking.openURL(upiUrl);
+        // Optionally, poll backend for payment status or use deep link callback
+        Alert.alert("Payment Initiated", "Please complete the payment in your UPI app.");
+      } else {
+        Alert.alert("Error", "No UPI app found on device.");
+      }
       setIsSubmitting(false);
+    } catch (error) {
+  Alert.alert("Error", error.message || "Failed to start payment.");
+  setIsSubmitting(false);
     }
   };
     // try {
@@ -262,6 +243,15 @@ const AddPoints = () => {
             onPress={submitRequest}
             isloading={isSubmitting}
           />
+          {/*
+            PayU UPI Integration Steps:
+            1. Register for a PayU merchant account and get your credentials (Merchant Key, Salt).
+            2. Update your backend to create PayU orders and generate UPI intent URLs.
+            3. Use the UPI intent URL to open the user's UPI app from React Native (see above).
+            4. After payment, verify status via backend (polling or webhook).
+            5. Remove all Razorpay code and dependencies from your project.
+            For more info: https://devguide.payu.in/upi-intent/
+          */}
         </View>
       </ScrollView>
       <StatusBar backgroundColor="#219C90" style="light" />

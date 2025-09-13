@@ -61,35 +61,25 @@ const AddPoints = () => {
     setIsSubmitting(true);
     const userId = await AsyncStorage.getItem("userId");
     try {
-      // Step 1: Request payment details from backend (PayU order/hash)
-      // You will need to implement a new endpoint in your backend to generate a PayU order and return UPI details or a UPI intent URL.
-      const formData = new FormData();
-      formData.append('user_id', userId);
-      formData.append('amount', requestForm.amount);
-      // Example endpoint: /api/payu_payment_start
-      const orderRes = await axios.post("http://10.0.2.2:8000/api/payu_payment_start", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
-      if (!orderRes.data.status) throw new Error(orderRes.data.message);
-      const upiUrl = orderRes.data.data.upi_url; // e.g., "upi://pay?..."
+      // Step 1: Generate UPI deep link
+  const upiId = "your-upi-id@upi"; // Replace with your actual UPI ID
+      const name = "Your Business Name";
+      const amount = requestForm.amount;
+      const transactionRef = uuid.v4();
+      const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR&tn=Add Points&tr=${transactionRef}`;
 
       // Step 2: Open UPI app using intent
-      // This will open the user's UPI app with payment details
-      
       const supported = await Linking.canOpenURL(upiUrl);
       if (supported) {
         await Linking.openURL(upiUrl);
-        // Optionally, poll backend for payment status or use deep link callback
-        Alert.alert("Payment Initiated", "Please complete the payment in your UPI app.");
+        Alert.alert("Payment Initiated", "Please complete the payment in your UPI app. After payment, enter the transaction ID and upload a screenshot for admin verification.");
       } else {
         Alert.alert("Error", "No UPI app found on device.");
       }
-      setIsSubmitting(false);
     } catch (error) {
-  Alert.alert("Error", error.message || "Failed to start payment.");
-  setIsSubmitting(false);
+      Alert.alert("Error", error.message || "Failed to start payment.");
     }
+    setIsSubmitting(false);
   };
     // try {
     //   const response = await axios.post("YOUR_UPLOAD_URL", formData, {
@@ -235,7 +225,25 @@ const AddPoints = () => {
             />
           </View>
 
-          {/* <CustomButton text={"Upload Image"} onPress={uploadImage} /> */}
+          {/* Screenshot upload section */}
+          <View className="my-2">
+            <Text className="ml-1 font-psemibold text-md">Upload Payment Screenshot</Text>
+            <TouchableOpacity
+              style={{ backgroundColor: '#219C90', borderRadius: 16, padding: 10, marginTop: 8, alignItems: 'center' }}
+              onPress={pickImage}
+            >
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                {selectedImage ? 'Change Screenshot' : 'Upload Screenshot'}
+              </Text>
+            </TouchableOpacity>
+            {selectedImage && (
+              <Image
+                source={{ uri: selectedImage }}
+                style={{ width: 120, height: 120, marginTop: 10, borderRadius: 8 }}
+                resizeMode="cover"
+              />
+            )}
+          </View>
           <CustomButton
             text={"Submit"}
             textStyles={"text-white"}

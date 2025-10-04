@@ -117,27 +117,55 @@ const AddPoints = () => {
       // Step 1: Generate UPI deep link
       const upiId = 'your-upi-id@upi'; // TODO: replace with actual UPI id or fetch from backend
       const name = 'Your Business Name';
-      const amount = requestForm.amount;
-      const transactionRef = uuid.v4();
-      const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
-        name
-      )}&am=${amount}&cu=INR&tn=Add Points&tr=${transactionRef}`;
+  // UPI `tr` must be alphanumeric and <= 35 chars. Use a simple timestamp-prefixed id.
+  const transactionRef = `TXN${Date.now()}`; // e.g. TXN169645... (numeric suffix)
 
-      // Step 2: Open UPI app using intent
-      const supported = await Linking.canOpenURL(upiUrl);
-      if (supported) {
-        await Linking.openURL(upiUrl);
-        Alert.alert(
-          'Payment Initiated',
-          'Please complete the payment in your UPI app. After payment, enter the transaction ID and upload a screenshot for admin verification.'
-        );
-      } else {
-        Alert.alert('Error', 'No UPI app found on device.');
+      // Validate amount
+      if (!requestForm.amount || isNaN(Number(requestForm.amount))) {
+        setIsSubmitting(false);
+        return Alert.alert('Message', 'Please enter a valid amount.');
       }
-    } catch (error) {
-      Alert.alert('Error', error.message || 'Failed to start payment.');
-    } finally {
-      setIsSubmitting(false);
+
+      const amountFixed = Number(requestForm.amount).toFixed(2); // e.g. 100.00
+
+      // Minimal set of params to maximize compatibility across UPI apps
+      const params = new URLSearchParams({
+        pa: upiId,
+        pn: name,
+        am: amountFixed,
+        tr: transactionRef,
+        tn: 'Add Points',
+        cu: 'INR',
+      }).toString();
+
+      const upiUrl = `upi://pay?${params}`;
+      console.log('UPI URI:', upiUrl);
+
+        const supported = await Linking.canOpenURL(upiUrl);
+        if (!supported) {
+          Alert.alert('No UPI app', 'No UPI app found on device. Switching to Manual mode.');
+          setPaymentMode('manual');
+          setIsSubmitting(false);
+          return;
+        }
+
+        try {
+          await Linking.openURL(upiUrl);
+          Alert.alert(
+            'Payment Initiated',
+            'Please complete the payment in your UPI app. After payment, enter the transaction ID and upload a screenshot for admin verification.'
+          );
+        } catch (err) {
+          console.error('Failed to open UPI app:', err);
+          Alert.alert('Payment Error', 'Failed to open UPI app. Switching to Manual mode.');
+          setPaymentMode('manual');
+        }
+      } catch (error) {
+        console.error('UPI flow error:', error);
+        Alert.alert('Error', error.message || 'Failed to start payment. Switching to Manual mode.');
+        setPaymentMode('manual');
+      } finally {
+        setIsSubmitting(false);
     }
   };
     // try {

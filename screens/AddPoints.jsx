@@ -28,6 +28,7 @@ const AddPoints = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, requestPermission] = MediaLibrary.usePermissions();
   const [isQrFetching, setIsQrFetching] = useState(false);
+  const [paymentMode, setPaymentMode] = useState('upi'); // 'upi' or 'manual'
   const [requestForm, setRequestForm] = useState({
     amount: "",
     paymentMethod: "",
@@ -53,34 +54,91 @@ const AddPoints = () => {
 
     if (!pickerResult.canceled) {
       setSelectedImage(pickerResult.assets[0].uri);
+      setImageType(
+        pickerResult.assets[0].mimeType
+          ? pickerResult.assets[0].mimeType.substring(6)
+          : ''
+      );
     }
-    setImageType(pickerResult.assets[0].mimeType.substring(6));
   };
 
-  // ...existing code...
   const submitRequest = async () => {
     setIsSubmitting(true);
     const userId = await AsyncStorage.getItem("userId");
+
+    if (paymentMode === 'manual') {
+      // Manual upload -> send multipart/form-data to backend
+      let formData = new FormData();
+      if (selectedImage) {
+        formData.append('image', {
+          uri: selectedImage,
+          type:
+            imageType === 'jpeg'
+              ? 'image/jpeg'
+              : imageType === 'png'
+              ? 'image/png'
+              : imageType === 'jpg' && 'image/jpg',
+          name: uuid.v4() + '.' + (imageType || 'jpg'),
+        });
+      }
+
+      formData.append('user_id', userId);
+      formData.append('amount', requestForm.amount);
+      formData.append('payment_method', requestForm.paymentMethod);
+      formData.append('name', requestForm.username);
+      formData.append('txnId', requestForm.transactionId);
+
+      try {
+        const response = await axios.post('api/add-payment-request', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          withCredentials: true,
+        });
+        Alert.alert('Message', response.data.message || 'Request submitted');
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Error', 'Failed to add request.');
+      } finally {
+        setRequestForm({
+          amount: '',
+          paymentMethod: '',
+          username: '',
+          transactionId: '',
+        });
+        setSelectedImage(null);
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    // UPI flow (open UPI intent)
     try {
       // Step 1: Generate UPI deep link
-      const upiId = "your-upi-id@upi"; // Replace with your actual UPI ID
-      const name = "Your Business Name";
+      const upiId = 'your-upi-id@upi'; // TODO: replace with actual UPI id or fetch from backend
+      const name = 'Your Business Name';
       const amount = requestForm.amount;
       const transactionRef = uuid.v4();
-      const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR&tn=Add Points&tr=${transactionRef}`;
+      const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+        name
+      )}&am=${amount}&cu=INR&tn=Add Points&tr=${transactionRef}`;
 
       // Step 2: Open UPI app using intent
       const supported = await Linking.canOpenURL(upiUrl);
       if (supported) {
         await Linking.openURL(upiUrl);
-        Alert.alert("Payment Initiated", "Please complete the payment in your UPI app. After payment, enter the transaction ID and upload a screenshot for admin verification.");
+        Alert.alert(
+          'Payment Initiated',
+          'Please complete the payment in your UPI app. After payment, enter the transaction ID and upload a screenshot for admin verification.'
+        );
       } else {
-        Alert.alert("Error", "No UPI app found on device.");
+        Alert.alert('Error', 'No UPI app found on device.');
       }
     } catch (error) {
-      Alert.alert("Error", error.message || "Failed to start payment.");
+      Alert.alert('Error', error.message || 'Failed to start payment.');
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
     // try {
     //   const response = await axios.post("YOUR_UPLOAD_URL", formData, {
@@ -153,42 +211,71 @@ const AddPoints = () => {
           </TouchableOpacity>
         </View>
         <View className="bg-[#BBE9FF] min-h-[20vh] justify-center px-4 py-6 mx-6 rounded-lg">
-          <View className="my-2">
-            <Text className="ml-1 font-psemibold text-md">Name</Text>
-            <InputBox
-              icon={"person"}
-              placeholder={"Enter Your Name"}
-              customStyles={""}
-              handleChangeText={(e) => {
-                if (/[^a-zA-Z\s]/g.test(e)) {
-                  return Alert.alert(
-                    "Message",
-                    "Input must contain only letters."
-                  );
-                }
-                setRequestForm({ ...requestForm, username: e });
+          <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 12 }}>
+            <TouchableOpacity
+              onPress={() => setPaymentMode('upi')}
+              style={{
+                backgroundColor: paymentMode === 'upi' ? '#0F67B1' : '#e6f2fb',
+                paddingVertical: 8,
+                paddingHorizontal: 16,
+                borderRadius: 20,
+                marginRight: 8,
               }}
-              value={requestForm.username || ""}
-            />
-          </View>
-          <View className="my-2">
-            <Text className="ml-1 font-psemibold text-md">Payment Method</Text>
-            <InputBox
-              icon={"journal"}
-              placeholder={"Enter Payment Method"}
-              customStyles={""}
-              handleChangeText={(e) => {
-                if (/[^a-zA-Z\s]/g.test(e)) {
-                  return Alert.alert(
-                    "Message",
-                    "Input must contain only letters."
-                  );
-                }
-                setRequestForm({ ...requestForm, paymentMethod: e });
+            >
+              <Text style={{ color: paymentMode === 'upi' ? 'white' : '#0F67B1', fontWeight: '600' }}>UPI</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setPaymentMode('manual')}
+              style={{
+                backgroundColor: paymentMode === 'manual' ? '#0F67B1' : '#e6f2fb',
+                paddingVertical: 8,
+                paddingHorizontal: 16,
+                borderRadius: 20,
               }}
-              value={requestForm.paymentMethod || ""}
-            />
+            >
+              <Text style={{ color: paymentMode === 'manual' ? 'white' : '#0F67B1', fontWeight: '600' }}>Manual Upload</Text>
+            </TouchableOpacity>
           </View>
+          {paymentMode === 'manual' && (
+            <>
+              <View className="my-2">
+                <Text className="ml-1 font-psemibold text-md">Name</Text>
+                <InputBox
+                  icon={"person"}
+                  placeholder={"Enter Your Name"}
+                  customStyles={""}
+                  handleChangeText={(e) => {
+                    if (/[^a-zA-Z\s]/g.test(e)) {
+                      return Alert.alert(
+                        "Message",
+                        "Input must contain only letters."
+                      );
+                    }
+                    setRequestForm({ ...requestForm, username: e });
+                  }}
+                  value={requestForm.username || ""}
+                />
+              </View>
+              <View className="my-2">
+                <Text className="ml-1 font-psemibold text-md">Payment Method</Text>
+                <InputBox
+                  icon={"journal"}
+                  placeholder={"Enter Payment Method"}
+                  customStyles={""}
+                  handleChangeText={(e) => {
+                    if (/[^a-zA-Z\s]/g.test(e)) {
+                      return Alert.alert(
+                        "Message",
+                        "Input must contain only letters."
+                      );
+                    }
+                    setRequestForm({ ...requestForm, paymentMethod: e });
+                  }}
+                  value={requestForm.paymentMethod || ""}
+                />
+              </View>
+            </>
+          )}
           <View className="my-2">
             <Text className="ml-1 font-psemibold text-md">Points</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 8 }}>
@@ -227,29 +314,58 @@ const AddPoints = () => {
           </View>
 
           {/* Screenshot upload section */}
-          <View className="my-2">
-            <Text className="ml-1 font-psemibold text-md">Upload Payment Screenshot</Text>
-            <TouchableOpacity
-              style={{ backgroundColor: '#219C90', borderRadius: 16, padding: 10, marginTop: 8, alignItems: 'center' }}
-              onPress={pickImage}
-            >
-              <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                {selectedImage ? 'Change Screenshot' : 'Upload Screenshot'}
-              </Text>
-            </TouchableOpacity>
-            {selectedImage && (
-              <Image
-                source={{ uri: selectedImage }}
-                style={{ width: 120, height: 120, marginTop: 10, borderRadius: 8 }}
-                resizeMode="cover"
+          {paymentMode === 'manual' && (
+            <View className="my-2">
+              <Text className="ml-1 font-psemibold text-md">UTR</Text>
+              <InputBox
+                icon={"receipt"}
+                placeholder={"Enter UTR"}
+                customStyles={""}
+                handleChangeText={(e) =>
+                  setRequestForm({ ...requestForm, transactionId: e })
+                }
+                value={requestForm.transactionId || ""}
               />
-            )}
-          </View>
+
+              <View style={{ marginTop: 10 }}>
+                <Text className="ml-1 font-psemibold text-md">Upload Payment Screenshot</Text>
+                <TouchableOpacity
+                  style={{ backgroundColor: '#219C90', borderRadius: 16, padding: 10, marginTop: 8, alignItems: 'center' }}
+                  onPress={pickImage}
+                >
+                  <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                    {selectedImage ? 'Change Screenshot' : 'Upload Screenshot'}
+                  </Text>
+                </TouchableOpacity>
+                {selectedImage && (
+                  <Image
+                    source={{ uri: selectedImage }}
+                    style={{ width: 120, height: 120, marginTop: 10, borderRadius: 8 }}
+                    resizeMode="cover"
+                  />
+                )}
+              </View>
+            </View>
+          )}
           <CustomButton
-            text={"Submit"}
+            text={paymentMode === 'upi' ? 'Pay' : 'Submit'}
             textStyles={"text-white"}
             customStyles={"bg-[#219C90] mt-6 "}
-            onPress={submitRequest}
+            onPress={() => {
+              // Basic validation
+              if (!requestForm.amount || !/^[0-9]+$/.test(requestForm.amount)) {
+                return Alert.alert('Message', 'Please enter a valid amount.');
+              }
+              if (paymentMode === 'manual') {
+                if (!requestForm.username) {
+                  return Alert.alert('Message', 'Please enter your name.');
+                }
+                if (!requestForm.paymentMethod) {
+                  return Alert.alert('Message', 'Please enter payment method.');
+                }
+              }
+              submitRequest();
+            }}
             isloading={isSubmitting}
           />
           {/*

@@ -73,7 +73,6 @@ function CustomDrawerContent(props) {
           {userStatus == "false" || userStatus == "DISABLED" ? (
             <View className="bg-[#E0E0E0] pt-2">
               <CustomDrawerItem
-              
                 itemName="Admin"
                 itemImage={constants.profileIcon}
                 currentRoute={currentRoute}

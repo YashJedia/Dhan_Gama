@@ -57,12 +57,13 @@ const AddPoints = () => {
     setImageType(pickerResult.assets[0].mimeType.substring(6));
   };
 
+  // ...existing code...
   const submitRequest = async () => {
     setIsSubmitting(true);
     const userId = await AsyncStorage.getItem("userId");
     try {
       // Step 1: Generate UPI deep link
-  const upiId = "your-upi-id@upi"; // Replace with your actual UPI ID
+      const upiId = "your-upi-id@upi"; // Replace with your actual UPI ID
       const name = "Your Business Name";
       const amount = requestForm.amount;
       const transactionRef = uuid.v4();

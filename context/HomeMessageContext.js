@@ -11,7 +11,7 @@ export const HomeMessageProvider = ({ children }) => {
     let intervalId;
     const fetchMessage = async () => {
       try {
-        const res = await axios.get("api/home_message");
+        const res = await axios.get("/api/home_message");
         if (res.data && res.data.data && res.data.data.message) {
           setHomeMessage(res.data.data.message);
         }

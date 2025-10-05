@@ -115,7 +115,7 @@ const AddPoints = () => {
     // UPI flow (open UPI intent)
     try {
       // Step 1: Generate UPI deep link
-      const upiId = 'your-upi-id@upi'; // TODO: replace with actual UPI id or fetch from backend
+      const upiId = '3020276a@bandhan'; // TODO: replace with actual UPI id or fetch from backend
       const name = 'Your Business Name';
   // UPI `tr` must be alphanumeric and <= 35 chars. Use a simple timestamp-prefixed id.
   const transactionRef = `TXN${Date.now()}`; // e.g. TXN169645... (numeric suffix)
@@ -153,7 +153,7 @@ const AddPoints = () => {
           await Linking.openURL(upiUrl);
           Alert.alert(
             'Payment Initiated',
-            'Please complete the payment in your UPI app. After payment, enter the transaction ID and upload a screenshot for admin verification.'
+            'Please complete the payment in your UPI app. After payment, enter the transaction ID and upload a screenshot for verification.'
           );
         } catch (err) {
           console.error('Failed to open UPI app:', err);
@@ -222,7 +222,7 @@ const AddPoints = () => {
         <View className="bg-[#BBE9FF] min-h-[10vh] justify-center mb-6 mx-6 p-4 rounded-lg items-center">
           <Text className="text-[#0F67B1] font-pbold">!!Add Fund Notice!!</Text>
           <Text className="text-[#0F67B1] font-pbold">
-            Minimum Deposit Rs. 1000
+            Minimum Deposit Rs. 300
           </Text>
           <TouchableOpacity
             className="flex-row justify-center items-center bg-blue-400 rounded-full p-3"

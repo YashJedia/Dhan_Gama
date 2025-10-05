@@ -184,7 +184,7 @@ const DrawerNavigation = () => {
       <Drawer.Screen name="My Wallet" component={MyWallet} />
       <Drawer.Screen name="Add Points" component={AddPoints} />
       <Drawer.Screen name="Withdraw Points" component={WithdrawPoints} />
-  <Drawer.Screen name="Admin Home Message" component={AdminHomeMessage} />
+  {/* <Drawer.Screen name="Admin Home Message" component={AdminHomeMessage} /> */}
       {/* <Drawer.Screen name="Bank Details" component={BankDetails} /> */}
       {/* <Drawer.Screen name="Win History" component={WinHistory} /> */}
       <Drawer.Screen name="My Bids" component={BidHistory} />

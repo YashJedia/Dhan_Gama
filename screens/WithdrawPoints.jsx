@@ -16,6 +16,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { getProfile } from "@/store/thunk/profileThunk";
 import { useDispatch } from "react-redux";
+import { baseUrl } from "@/utils/common";
+
 const WithdrawPoints = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,8 +46,20 @@ const WithdrawPoints = () => {
       return;
     }
     setIsSubmitting(true);
-    // Submit logic here (API call or local handling)
-    setTimeout(() => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const formData = new FormData();
+      formData.append('user_id', userId);
+      formData.append('amount', requestForm.amount);
+      formData.append('payment_method', 'Bank'); // or use a value from your UI
+      formData.append('request_number', requestForm.bankAccount); // or another unique value
+      formData.append('holder_name', requestForm.holderName);
+      formData.append('bank_account', requestForm.bankAccount);
+      formData.append('ifsc_code', requestForm.ifscCode);
+      formData.append('bank_name', requestForm.bankName);
+      await axios.post(baseUrl("api/withdraw-payment-request"), formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       Alert.alert("Success", "Withdrawal request submitted.");
       setRequestForm({
         holderName: "",
@@ -54,8 +68,12 @@ const WithdrawPoints = () => {
         bankName: "",
         amount: "",
       });
+    } catch (error) {
+      console.log(error?.response?.data || error?.message || error);
+      Alert.alert("Error", "Failed to submit withdrawal request.");
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   return (

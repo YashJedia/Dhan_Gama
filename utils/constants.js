@@ -66,4 +66,6 @@ export default {
   telegramIcon,
   walletIcon2,
   mainLogo,
+  // Share URL for drawer share button
+  shareUrl: "https://dhan-gama-website-link.vercel.app",
 };

@@ -6,6 +6,7 @@ import {
   StatusBar,
   NativeModules,
   Alert,
+  Linking,
 } from "react-native";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import userImage from "../assets/images/profile.png";
@@ -53,6 +54,21 @@ function CustomDrawerContent(props) {
     // );
   };
 
+  const handleShare = async () => {
+    const url = constants.shareUrl || "https://dhan-gama-website-link.vercel.app";
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert("Cannot open link", url);
+      }
+    } catch (error) {
+      console.log("Share open error:", error);
+      Alert.alert("Error", "Unable to open link at this time.");
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-[#219C90]">
       <DrawerContentScrollView showsVerticalScrollIndicator={false} {...props}>
@@ -94,6 +110,7 @@ function CustomDrawerContent(props) {
                 itemName="Share"
                 itemImage={constants.shareIcon}
                 currentRoute={currentRoute}
+                onPress={handleShare}
               />
               <CustomDrawerItem
                 itemName="Rating"
@@ -210,6 +227,7 @@ function CustomDrawerContent(props) {
                 itemName="Share"
                 itemImage={constants.shareIcon}
                 currentRoute={currentRoute}
+                onPress={handleShare}
               />
               <CustomDrawerItem
                 itemName="Rating"

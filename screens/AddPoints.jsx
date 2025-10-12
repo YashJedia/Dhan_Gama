@@ -116,7 +116,7 @@ const AddPoints = () => {
     try {
       // Step 1: Generate UPI deep link
       const upiId = '3020276a@bandhan'; // TODO: replace with actual UPI id or fetch from backend
-      const name = 'Your Business Name';
+      const name = 'Dhan Gama';
   // UPI `tr` must be alphanumeric and <= 35 chars. Use a simple timestamp-prefixed id.
   const transactionRef = `TXN${Date.now()}`; // e.g. TXN169645... (numeric suffix)
 

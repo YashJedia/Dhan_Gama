@@ -67,5 +67,5 @@ export default {
   walletIcon2,
   mainLogo,
   // Share URL for drawer share button
-  shareUrl: "https://dhan-gama-website-link.vercel.app",
+  shareUrl: "https://share.google/Dk3ckVbnLvLVUaIMS",
 };

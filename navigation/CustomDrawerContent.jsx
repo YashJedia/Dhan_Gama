@@ -55,7 +55,7 @@ function CustomDrawerContent(props) {
   };
 
   const handleShare = async () => {
-    const url = constants.shareUrl || "https://dhan-gama-website-link.vercel.app";
+    const url = constants.shareUrl || "https://share.google/Dk3ckVbnLvLVUaIMS";
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) {

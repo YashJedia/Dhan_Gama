@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StatusBar, Alert } from "react-native";
+import { View, Text, ScrollView, StatusBar, Alert, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "@/components/CustomButton";

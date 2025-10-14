@@ -36,6 +36,17 @@ const AddPoints = () => {
     transactionId: "",
   });
   const [imageType, setImageType] = useState("");
+  // UPI info fetched from backend
+  const [upiInfo, setUpiInfo] = useState({ pa: '', pn: '' });
+  React.useEffect(() => {
+    axios.get(`${baseUrl('api/get_upi_address')}`)
+      .then(res => {
+        if (res.data.success) {
+          setUpiInfo({ pa: res.data.upi, pn: res.data.name });
+        }
+      })
+      .catch(() => {});
+  }, []);
   const pickImage = async () => {
     // Ask for permission to access the gallery
     let result = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -67,7 +78,7 @@ const AddPoints = () => {
     const userId = await AsyncStorage.getItem("userId");
 
     if (paymentMode === 'manual') {
-      // Manual upload -> send multipart/form-data to backend
+      // ...existing code for manual upload...
       let formData = new FormData();
       if (selectedImage) {
         formData.append('image', {
@@ -81,13 +92,11 @@ const AddPoints = () => {
           name: uuid.v4() + '.' + (imageType || 'jpg'),
         });
       }
-
       formData.append('user_id', userId);
       formData.append('amount', requestForm.amount);
       formData.append('payment_method', requestForm.paymentMethod);
       formData.append('name', requestForm.username);
       formData.append('txnId', requestForm.transactionId);
-
       try {
         const response = await axios.post('api/add-payment-request', formData, {
           headers: {
@@ -114,11 +123,18 @@ const AddPoints = () => {
 
     // UPI flow (open UPI intent)
     try {
-      // Step 1: Generate UPI deep link
-      const upiId = '3020276a@bandhan'; // TODO: replace with actual UPI id or fetch from backend
-      const name = 'Dhan Gama';
-  // UPI `tr` must be alphanumeric and <= 35 chars. Use a simple timestamp-prefixed id.
-  const transactionRef = `TXN${Date.now()}`; // e.g. TXN169645... (numeric suffix)
+      // Fetch latest UPI info before payment
+      let latestUpiInfo = { pa: '', pn: '' };
+      try {
+        const res = await axios.get(`${baseUrl('api/get_upi_address')}`);
+        if (res.data.success) {
+          latestUpiInfo = { pa: res.data.upi, pn: res.data.name };
+        }
+      } catch (err) {}
+      const upiId = latestUpiInfo.pa || upiInfo.pa || '3020276a@bandhan';
+      const name = latestUpiInfo.pn || upiInfo.pn || 'Dhan Gama';
+      // UPI `tr` must be alphanumeric and <= 35 chars. Use a simple timestamp-prefixed id.
+      const transactionRef = `TXN${Date.now()}`;
 
       // Validate amount
       if (!requestForm.amount || isNaN(Number(requestForm.amount))) {
@@ -126,9 +142,7 @@ const AddPoints = () => {
         return Alert.alert('Message', 'Please enter a valid amount.');
       }
 
-      const amountFixed = Number(requestForm.amount).toFixed(2); // e.g. 100.00
-
-      // Minimal set of params to maximize compatibility across UPI apps
+      const amountFixed = Number(requestForm.amount).toFixed(2);
       const params = new URLSearchParams({
         pa: upiId,
         pn: name,
@@ -137,35 +151,32 @@ const AddPoints = () => {
         tn: 'Add Points',
         cu: 'INR',
       }).toString();
-
       const upiUrl = `upi://pay?${params}`;
       console.log('UPI URI:', upiUrl);
-
-        const supported = await Linking.canOpenURL(upiUrl);
-        if (!supported) {
-          Alert.alert('No UPI app', 'No UPI app found on device. Switching to Manual mode.');
-          setPaymentMode('manual');
-          setIsSubmitting(false);
-          return;
-        }
-
-        try {
-          await Linking.openURL(upiUrl);
-          Alert.alert(
-            'Payment Initiated',
-            'Please complete the payment in your UPI app. After payment, enter the transaction ID and upload a screenshot for verification.'
-          );
-        } catch (err) {
-          console.error('Failed to open UPI app:', err);
-          Alert.alert('Payment Error', 'Failed to open UPI app. Switching to Manual mode.');
-          setPaymentMode('manual');
-        }
-      } catch (error) {
-        console.error('UPI flow error:', error);
-        Alert.alert('Error', error.message || 'Failed to start payment. Switching to Manual mode.');
+      const supported = await Linking.canOpenURL(upiUrl);
+      if (!supported) {
+        Alert.alert('No UPI app', 'No UPI app found on device. Switching to Manual mode.');
         setPaymentMode('manual');
-      } finally {
         setIsSubmitting(false);
+        return;
+      }
+      try {
+        await Linking.openURL(upiUrl);
+        Alert.alert(
+          'Payment Initiated',
+          'Please complete the payment in your UPI app. After payment, enter the transaction ID and upload a screenshot for verification.'
+        );
+      } catch (err) {
+        console.error('Failed to open UPI app:', err);
+        Alert.alert('Payment Error', 'Failed to open UPI app. Switching to Manual mode.');
+        setPaymentMode('manual');
+      }
+    } catch (error) {
+      console.error('UPI flow error:', error);
+      Alert.alert('Error', error.message || 'Failed to start payment. Switching to Manual mode.');
+      setPaymentMode('manual');
+    } finally {
+      setIsSubmitting(false);
     }
   };
     // try {
